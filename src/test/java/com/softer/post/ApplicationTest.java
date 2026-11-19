@@ -1,7 +1,9 @@
 package com.softer.post;
 
+import com.softer.post.repository.TestH2Repository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
@@ -19,6 +21,9 @@ public class ApplicationTest {
     // Voy a concatenar la url por partes
     private String baseUrl = "http://localhost";
     private static RestTemplate restTemplate;
+
+    @Autowired
+    private TestH2Repository testH2Repository;
 
     @BeforeAll //Este se ejecutara antes pero de manera apartada sin secuencia con las otras pruebas
     public static void init(){
