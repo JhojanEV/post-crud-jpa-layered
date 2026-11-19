@@ -2,20 +2,21 @@ package com.softer.post;
 
 import com.softer.post.model.Post;
 import com.softer.post.repository.TestH2Repository;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 //Se va a ejecutar en un puerto random
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ApplicationTest {
 
     //Configurando entorno de pruebas
@@ -44,6 +45,7 @@ public class ApplicationTest {
 
     //----------------------- Integration Tets ----------------
     @Test
+    @Order(1)
     public void testAddPost(){
         // Creo en memoria una publicacion
         Post post = new Post(1, 1, "Tittle 1", "Body 1", null);
@@ -56,4 +58,18 @@ public class ApplicationTest {
         assertEquals(1, testH2Repository.findAll().size());
 
     }
+
+    @Test
+    @Order(2)
+    public void testGetPosts(){
+        List<Post> response = restTemplate.getForObject(baseUrl, List.class);
+        assertEquals(1, response.size());
+        assertEquals(1, testH2Repository.findAll().size());
+
+    }
+
+    //Para que el segundo test funcione primero debe pasar por el primero
+    // Ejecutar toda la clase en ves de los test de manera separada
+    // POR TEORIA, LAS PRUEBAS NUNCA DEPENDEN DE OTRAS PRUEBAS, DEBEN DE SER
+    // INDEPENDIENTES (queda para el sabado )
 }
