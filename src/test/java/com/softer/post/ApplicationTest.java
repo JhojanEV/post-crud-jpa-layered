@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 //Se va a ejecutar en un puerto random
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -51,7 +51,7 @@ public class ApplicationTest {
     @DisplayName("Should register a new post")
     //Despues de ejecutar el test ejecute esta secuencia sql
     @Sql(statements = "DELETE FROM post", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    public void testAddPost(){
+    public void test3_testAddPost(){
         // Creo en memoria una publicacion
         Post post = new Post(1, 1, "Tittle 1", "Body 1", null);
         // Envio una request tipo post que devuelve el endpoint de la api
@@ -67,7 +67,7 @@ public class ApplicationTest {
     @Test
     @Order(2)
     @DisplayName("Should get 0 posts when table is empty")
-    public void testGetPostsWhenTableIsEmpty(){
+    public void test1_testGetPostsWhenTableIsEmpty(){
         List<Post> response = restTemplate.getForObject(baseUrl, List.class);
         assertEquals(0, response.size());
         assertEquals(0, testH2Repository.findAll().size());
@@ -86,11 +86,24 @@ public class ApplicationTest {
     @Sql(statements = "INSERT INTO post(id, user_id, title, body, version) VALUES (1,1, 'Tittle 1', 'Body 1', 1)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     // IMPORTANTE: Se debe de dejar la bd en el mismo estado en el que se encontró
     @Sql(statements = "DELETE FROM post", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    public void testGetPostsWhenTableIsNotEmpty(){
+    public void test2_testGetPostsWhenTableIsNotEmpty(){
         List<Post> response = restTemplate.getForObject(baseUrl, List.class);
         assertEquals(1, response.size());
         assertEquals(1, testH2Repository.findAll().size());
 
     } // Aqui probamos que cuente los registros cuando haya uno
+
+    @Test
+    @DisplayName("Should get post with id=1")
+    @Sql(statements = "INSERT INTO post(id, user_id, title, body, version) VALUES (1,1, 'Tittle 1', 'Body 1', 1)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(statements = "DELETE FROM post", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    public void test4_FindPostById(){
+        Post post = restTemplate.getForObject(baseUrl + "/{id}", Post.class, 1);
+        assertAll( // Quiero probar estas tres cosas para que el test funcione bien
+                () -> assertNotNull(post),
+                () -> assertEquals(1, post.getId()),
+                () -> assertEquals("Tittle 1", post.getTitle())
+        );
+    }
 
 }
