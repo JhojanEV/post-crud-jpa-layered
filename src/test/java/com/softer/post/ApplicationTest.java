@@ -110,7 +110,7 @@ public class ApplicationTest {
     @DisplayName("Should update post with id=1")
     @Sql(statements = "INSERT INTO post(id, user_id, title, body, version) VALUES (1,1, 'Tittle 1', 'Body 1', 1)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(statements = "DELETE FROM post", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    public void test5_UpdatePost(){
+    public void test5_testUpdatePost(){
         Post post = new Post(1,1,"New Tittle 1", "Body 1", 1);
         restTemplate.put(baseUrl+"/{id}", post, 1);
         Post postFromDB = testH2Repository.findById(1).get();
@@ -118,6 +118,17 @@ public class ApplicationTest {
                 () -> assertNotNull(postFromDB),
                 () -> assertEquals("New Tittle 1", postFromDB.getTitle())
         );
+    }
+
+    @Test
+    @DisplayName("Should delete post with id=1")
+    @Sql(statements = "INSERT INTO post(id, user_id, title, body, version) VALUES (1,1, 'Tittle 1', 'Body 1', 1)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(statements = "DELETE FROM post", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    public void test6_testDeletePost(){
+        int recordCount = testH2Repository.findAll().size();
+        assertEquals(1, recordCount);
+        restTemplate.delete(baseUrl+"/{id}", 1);
+        assertEquals(0, testH2Repository.findAll().size());
     }
 
 }
