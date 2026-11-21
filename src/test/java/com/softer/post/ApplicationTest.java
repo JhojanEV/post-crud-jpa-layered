@@ -17,7 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 //Se va a ejecutar en un puerto random
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+//@TestMethodOrder(MethodOrderer.OrderAnnotation.class) -> Orden segun numero
+@TestMethodOrder(MethodOrderer.MethodName.class) // Orden segun el nombre
 public class ApplicationTest {
 
     //Configurando entorno de pruebas
