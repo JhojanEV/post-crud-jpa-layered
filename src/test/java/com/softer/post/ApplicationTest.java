@@ -65,8 +65,8 @@ public class ApplicationTest {
 
     @Test
     @Order(2)
-    @DisplayName("Should get all posts")
-    public void testGetPosts(){
+    @DisplayName("Should get 0 posts when table is empty")
+    public void testGetPostsWhenTableIsEmpty(){
         List<Post> response = restTemplate.getForObject(baseUrl, List.class);
         assertEquals(0, response.size());
         assertEquals(0, testH2Repository.findAll().size());
@@ -77,4 +77,19 @@ public class ApplicationTest {
     // Ejecutar toda la clase en ves de los test de manera separada
     // POR TEORIA, LAS PRUEBAS NUNCA DEPENDEN DE OTRAS PRUEBAS, DEBEN DE SER
     // INDEPENDIENTES
+
+    @Test
+    @Order(3)
+    @DisplayName("Should get all posts when table is not empty")
+    // Antes de ejecutar el test primero que se ejecute este metodo sql
+    @Sql(statements = "INSERT INTO post(id, user_id, title, body, version) VALUES (1,1, 'Tittle 1', 'Body 1', 1)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    // IMPORTANTE: Se debe de dejar la bd en el mismo estado en el que se encontró
+    @Sql(statements = "DELETE FROM post", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    public void testGetPostsWhenTableIsNotEmpty(){
+        List<Post> response = restTemplate.getForObject(baseUrl, List.class);
+        assertEquals(1, response.size());
+        assertEquals(1, testH2Repository.findAll().size());
+
+    } // Aqui probamos que cuente los registros cuando haya uno
+
 }
